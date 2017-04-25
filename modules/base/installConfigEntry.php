@@ -33,6 +33,21 @@ require_once(OWA_BASE_DIR.'/owa_view.php');
 class owa_installConfigEntryView extends owa_view {
 			
 	function render($data) {
+
+        $connectstr_dbhost = '';
+        $connectstr_dbname = '';
+        $connectstr_dbusername = '';
+        $connectstr_dbpassword = '';
+        foreach ($_SERVER as $key => $value) {
+            if (strpos($key, "MYSQLCONNSTR_") !== 0) {
+                continue;
+            }
+            
+            $connectstr_dbhost = preg_replace("/^.*Data Source=(.+?);.*$/", "\\1", $value);
+            $connectstr_dbname = preg_replace("/^.*Database=(.+?);.*$/", "\\1", $value);
+            $connectstr_dbusername = preg_replace("/^.*User Id=(.+?);.*$/", "\\1", $value);
+            $connectstr_dbpassword = preg_replace("/^.*Password=(.+?)$/", "\\1", $value);
+        }
 		
 		//page title
 		$this->t->set('page_title', 'Configuration File Generator');
@@ -40,16 +55,16 @@ class owa_installConfigEntryView extends owa_view {
 		
 		$config = $this->get('config');
 		if ( ! defined( $config['db_host'] ) ) {
-			$config['db_host'] = 'yourdbhostgoeshere';
+			$config['db_host'] =  $connectstr_dbhost;
 		}
 		if ( ! defined( $config['db_name'] ) ) {
-			$config['db_name'] = 'yourdbnamegoeshere';
+			$config['db_name'] =  $connectstr_dbname;
 		}
 		if ( ! defined( $config['db_user'] ) ) {
-			$config['db_user'] = 'yourdbusergoeshere';
+			$config['db_user'] =  $connectstr_dbusername;
 		}
 		if ( ! defined( $config['db_password'] ) ) {
-			$config['db_password'] = 'yourdbpasswordgoeshere';
+			$config['db_password'] =  $connectstr_dbpassword;
 		}
 		$this->body->set('config', $config);
 		
